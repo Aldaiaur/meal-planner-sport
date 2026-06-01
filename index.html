@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#2a7d4f">
+  <title>Meal Planner Sport</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g-dark:    #1b5e35;
+      --g-main:    #2a7d4f;
+      --g-med:     #3ea06a;
+      --g-light:   #6cc494;
+      --g-pale:    #e6f4ec;
+      --g-xpale:   #f4fbf6;
+      --bg:        #f2f9f5;
+      --white:     #ffffff;
+      --text:      #182820;
+      --muted:     #5e7d6a;
+      --border:    #c8e2d5;
+      --shadow-s:  0 1px 6px rgba(26,94,53,.09);
+      --shadow-m:  0 3px 14px rgba(26,94,53,.13);
+      --shadow-lg: 0 6px 28px rgba(26,94,53,.18);
+      --r:         14px;
+      --r-sm:      9px;
+      --nav-h:     66px;
+      --hdr-h:     56px;
+      --font:      -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    #app { width: 100%; }
+
+    /* ── HEADER ── */
+    #header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--hdr-h);
+      background: linear-gradient(135deg, var(--g-main) 0%, var(--g-med) 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 10px;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,.18);
+    }
+    #header h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      flex: 1;
+      letter-spacing: -.2px;
+    }
+    .header-week {
+      font-size: .72rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.75);
+      background: rgba(255,255,255,.18);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── MAIN ── */
+    #main {
+      position: fixed;
+      top: var(--hdr-h);
+      bottom: var(--nav-h);
+      left: 0; right: 0;
+      overflow: hidden;
+    }
+
+    .tab-pane {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 14px;
+      display: none;
+      scroll-behavior: smooth;
+    }
+    .tab-pane.active { display: block; }
+
+    /* ── BOTTOM NAV ── */
+    #nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      display: flex;
+      z-index: 100;
+      box-shadow: 0 -2px 14px rgba(0,0,0,.06);
+    }
+    .nb {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: .62rem;
+      font-weight: 600;
+      letter-spacing: .2px;
+      transition: color .18s;
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+    .nb.active { color: var(--g-main); }
+    .nb .ni { font-size: 1.45rem; line-height: 1; }
+    .nb .badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 18px);
+      background: #e53935;
+      color: #fff;
+      font-size: .55rem;
+      font-weight: 800;
+      min-width: 16px;
+      height: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+    }
+    .nb .badge.hidden { display: none; }
+
+    /* ── SECTION TITLE ── */
+    .sect-title {
+      font-size: .7rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      margin: 4px 0 10px;
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 14px;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 11px 16px 11px 42px;
+      border-radius: 50px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      font-size: .92rem;
+      outline: none;
+      color: var(--text);
+      font-family: var(--font);
+      transition: border-color .18s, box-shadow .18s;
+      box-shadow: var(--shadow-s);
+    }
+    .search-wrap input:focus {
+      border-color: var(--g-light);
+      box-shadow: 0 0 0 3px rgba(62,160,106,.15);
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    /* ── RECIPE CARDS ── */
+    .recipe-card {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1.5px solid var(--border);
+      margin-bottom: 9px;
+      overflow: hidden;
+      box-shadow: var(--shadow-s);
+      transition: box-shadow .18s;
+    }
+    .recipe-card.open { box-shadow: var(--shadow-m); }
+
+    .rch {
+      display: flex;
+      align-items: center;
+      padding: 13px 14px;
+      cursor: pointer;
+      gap: 11px;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .rc-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .rc-info { flex: 1; min-width: 0; }
+    .rc-name {
+      font-weight: 700;
+      font-size: .9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 20px;
+      margin-top: 4px;
+    }
+    .rc-chev {
+      color: var(--muted);
+      font-size: .85rem;
+      transition: transform .28s;
+      flex-shrink: 0;
+    }
+    .recipe-card.open .rc-chev { transform: rotate(180deg); }
+
+    .rc-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .32s ease;
+    }
+    .recipe-card.open .rc-body { max-height: 800px; }
+
+    .rc-body-inner {
+      padding: 0 14px 14px;
+      border-top: 1px solid var(--g-pale);
+    }
+    .ing-title {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      padding: 10px 0 8px;
+    }
+    .ing-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+    .ing-pill {
+      background: var(--g-pale);
+      border-radius: 20px;
+      padding: 5px 11px;
+      font-size: .8rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ing-qty { font-weight: 800; color: var(--g-dark); }
+
+    /* ── PLANNING ── */
+    .tpl-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-tpl {
+      flex: 1;
+      padding: 10px 6px;
+      border: 1.5px solid var(--g-med);
+      background: var(--white);
+      border-radius: var(--r-sm);
+      font-size: .79rem;
+      font-weight: 700;
+      color: var(--g-main);
+      cursor: pointer;
+      text-align: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: background .12s, color .12s;
+      font-family: var(--font);
+    }
+    .btn-tpl:active { background: var(--g-main); color: #fff; }
+
+    .day-card {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1.5px solid var(--border);
+      margin-bottom: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow-s);
+    }
+    .day-hdr {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      background: linear-gradient(90deg, var(--g-pale) 0%, var(--g-xpale) 100%);
+      gap: 8px;
+    }
+    .day-name {
+      font-weight: 800;
+      font-size: .92rem;
+      color: var(--g-dark);
+      flex: 1;
+    }
+    .today-badge {
+      font-size: .65rem;
+      font-weight: 700;
+      color: var(--g-main);
+      background: rgba(42,125,79,.14);
+      padding: 2px 9px;
+      border-radius: 20px;
+    }
+    .meal-rows { padding: 2px 0; }
+    .meal-row {
+      display: flex;
+      align-items: center;
+      padding: 7px 14px;
+      gap: 9px;
+      border-bottom: 1px solid var(--g-xpale);
+    }
+    .meal-row:last-child { border-bottom: none; }
+    .meal-lbl {
+      font-size: .7rem;
+      font-weight: 800;
+      color: var(--muted);
+      width: 46px;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      letter-spacing: .2px;
+    }
+    .meal-sel {
+      flex: 1;
+      padding: 8px 30px 8px 10px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      background: var(--white);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235e7d6a' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      -webkit-appearance: none;
+      appearance: none;
+      font-size: .82rem;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: border-color .15s;
+      min-width: 0;
+    }
+    .meal-sel:focus { border-color: var(--g-light); }
+
+    .gen-wrap { padding-top: 6px; }
+    .btn-gen {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--g-main) 0%, var(--g-med) 100%);
+      color: #fff;
+      border: none;
+      border-radius: var(--r);
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-lg);
+      -webkit-tap-highlight-color: transparent;
+      font-family: var(--font);
+      letter-spacing: -.1px;
+      transition: opacity .12s, transform .1s;
+    }
+    .btn-gen:active { opacity: .85; transform: scale(.98); }
+
+    /* ── COURSES ── */
+    .crs-top {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+    .crs-ttl { flex: 1; font-weight: 800; font-size: 1rem; }
+    .crs-cnt {
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--g-main);
+      background: var(--g-pale);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .crs-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-act {
+      flex: 1;
+      padding: 10px 6px;
+      border-radius: var(--r-sm);
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      -webkit-tap-highlight-color: transparent;
+      font-family: var(--font);
+      box-shadow: var(--shadow-s);
+      transition: all .12s;
+    }
+    .btn-act.pri {
+      background: linear-gradient(135deg, var(--g-main) 0%, var(--g-med) 100%);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: var(--shadow-m);
+    }
+    .btn-act:active { opacity: .75; transform: scale(.97); }
+
+    .ci {
+      display: flex;
+      align-items: center;
+      padding: 11px 14px;
+      background: var(--white);
+      border-radius: var(--r-sm);
+      margin-bottom: 6px;
+      border: 1.5px solid var(--border);
+      gap: 11px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: var(--shadow-s);
+      transition: opacity .2s;
+    }
+    .ci.done { opacity: .45; }
+    .ci-check {
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .72rem;
+      transition: all .18s;
+    }
+    .ci.done .ci-check {
+      background: var(--g-main);
+      border-color: var(--g-main);
+      color: #fff;
+    }
+    .ci-name {
+      flex: 1;
+      font-size: .88rem;
+      font-weight: 600;
+      min-width: 0;
+    }
+    .ci.done .ci-name { text-decoration: line-through; }
+    .ci-qty {
+      font-size: .78rem;
+      font-weight: 700;
+      color: var(--g-main);
+      background: var(--g-pale);
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+    .empty .e-ico { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .empty p { font-size: .88rem; line-height: 1.6; }
+    .empty strong { color: var(--g-main); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: calc(var(--nav-h) + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: var(--text);
+      color: #fff;
+      padding: 9px 18px;
+      border-radius: 24px;
+      font-size: .83rem;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s;
+      z-index: 9999;
+      white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(0,0,0,.25);
+      font-family: var(--font);
+    }
+    #toast.on {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    @media (min-width: 500px) {
+      .tab-pane { padding-left: 20px; padding-right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="header">
+    <span style="font-size:1.35rem">🥗</span>
+    <h1>Meal Planner Sport</h1>
+    <span class="header-week" id="week-label"></span>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- ── TAB 1 : RECETTES ── -->
+    <section class="tab-pane active" id="pane-recettes">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="q" placeholder="Rechercher une recette ou catégorie…" oninput="filterR()">
+      </div>
+      <div id="r-list"></div>
+    </section>
+
+    <!-- ── TAB 2 : PLANNING ── -->
+    <section class="tab-pane" id="pane-planning">
+      <div class="tpl-row">
+        <button class="btn-tpl" onclick="loadTpl('sport')">🏋️ Menu Sport</button>
+        <button class="btn-tpl" onclick="loadTpl('ultra')">⚡ Menu Ultra-Intense</button>
+      </div>
+      <div id="plan-grid"></div>
+      <div class="gen-wrap">
+        <button class="btn-gen" onclick="genCourses()">🛒 Générer la liste de courses</button>
+      </div>
+    </section>
+
+    <!-- ── TAB 3 : COURSES ── -->
+    <section class="tab-pane" id="pane-courses">
+      <div class="crs-top">
+        <span class="crs-ttl">Liste de courses</span>
+        <span class="crs-cnt" id="crs-cnt">0 article</span>
+      </div>
+      <div class="crs-actions">
+        <button class="btn-act pri" onclick="copyCrs()">📋 Copier la liste</button>
+        <button class="btn-act" onclick="uncheckAll()">☐ Tout décocher</button>
+      </div>
+      <div id="crs-list">
+        <div class="empty">
+          <span class="e-ico">🛒</span>
+          <p>Planifiez vos repas dans l'onglet<br><strong>Planning</strong> puis appuyez sur<br><strong>Générer la liste de courses</strong></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nb active" id="nb-recettes" onclick="goTab('recettes')">
+      <span class="ni">📖</span><span>Recettes</span>
+    </button>
+    <button class="nb" id="nb-planning" onclick="goTab('planning')">
+      <span class="ni">📅</span><span>Planning</span>
+    </button>
+    <button class="nb" id="nb-courses" onclick="goTab('courses')">
+      <span class="ni">🛒</span>
+      <span class="badge hidden" id="crs-badge">0</span>
+      <span>Courses</span>
+    </button>
+  </nav>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════ */
+
+const JOURS = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'];
+const JOURS_L = {
+  lundi:'Lundi', mardi:'Mardi', mercredi:'Mercredi',
+  jeudi:'Jeudi', vendredi:'Vendredi', samedi:'Samedi', dimanche:'Dimanche'
+};
+const REPAS = ['pdj','dejeuner','collation','diner'];
+const REPAS_L = { pdj:'P-Déj.', dejeuner:'Déj.', collation:'Coll.', diner:'Dîner' };
+
+const CAT_STYLE = {
+  'Petit-Déjeuner': { bg:'#fff3e0', color:'#bf5000' },
+  'Plat':           { bg:'#e6f4ec', color:'#1b5e35' },
+  'Dîner':          { bg:'#e8eaf6', color:'#283593' },
+  'Collation':      { bg:'#fce4ec', color:'#ad1457' },
+};
+
+const R = [
+  // ── Issues du fichier Excel ──────────────────────────────
+  {
+    id:1, nom:'Curry Japonais Bœuf', cat:'Plat', ico:'🍛',
+    desc:'Curry profond et savoureux, encore meilleur le lendemain.',
+    ing:[
+      {n:'Bœuf haché',      q:800, u:'g'},
+      {n:'Tomates',         q:8,   u:'pièces'},
+      {n:'Aubergine',       q:1,   u:'pièce'},
+      {n:'Champignons Enoki',q:2,  u:'sachets'},
+      {n:'Roux curry japonais',q:1,u:'boîte'},
+      {n:'Chocolat noir',   q:50,  u:'g'},
+      {n:'Sauce Otafuku',   q:2,   u:'càs'},
+    ]
+  },
+  {
+    id:2, nom:'Pâtes Cremeuses Poulet Chorizo', cat:'Plat', ico:'🍝',
+    desc:'One-pot ultra-complet, cuit en 20 min.',
+    ing:[
+      {n:'Tagliatelles',         q:400, u:'g'},
+      {n:'Blancs de poulet',     q:600, u:'g'},
+      {n:'Chorizo',              q:160, u:'g'},
+      {n:'Oignon rouge',         q:1,   u:'pièce'},
+      {n:'Tomates séchées',      q:80,  u:'g'},
+      {n:'Épinards',             q:200, u:'g'},
+      {n:'Crème liquide légère', q:300, u:'ml'},
+      {n:'Bouillon de volaille', q:650, u:'ml'},
+    ]
+  },
+  {
+    id:3, nom:'Poulet Panko Curry + Riz', cat:'Plat', ico:'🍱',
+    desc:'Curry de légumes japonais avec tonkatsu de poulet pané.',
+    ing:[
+      {n:'Riz basmati',         q:200, u:'g'},
+      {n:'Carottes',            q:2,   u:'pièces'},
+      {n:'Pommes de terre',     q:3,   u:'pièces'},
+      {n:'Oignons',             q:2,   u:'pièces'},
+      {n:'Roux curry japonais', q:3,   u:'carrés'},
+      {n:'Côte de porc fine',   q:1,   u:'pièce'},
+      {n:'Farine',              q:50,  u:'g'},
+      {n:'Œufs',                q:1,   u:'pièce'},
+      {n:'Panko',               q:80,  u:'g'},
+    ]
+  },
+  {
+    id:4, nom:'Poulet Four Croûte Tendre', cat:'Plat', ico:'🍗',
+    desc:'Moelleux garanti grâce à la croûte moutarde-parmesan.',
+    ing:[
+      {n:'Blancs de poulet',  q:4,  u:'pièces'},
+      {n:'Moutarde de Dijon', q:3,  u:'càs'},
+      {n:'Yaourt grec',       q:100,u:'g'},
+      {n:'Parmesan râpé',     q:50, u:'g'},
+      {n:'Ail',               q:1,  u:'gousse'},
+    ]
+  },
+  // ── Recettes sport complémentaires ──────────────────────
+  {
+    id:5, nom:'Chili Sin Carne + Riz', cat:'Plat', ico:'🌶️',
+    desc:'Protéines végétales et fibres pour la performance.',
+    ing:[
+      {n:'Riz basmati complet', q:100, u:'g'},
+      {n:'Haricots rouges',     q:250, u:'g'},
+      {n:'Coulis de tomate',    q:200, u:'g'},
+      {n:'Oignon',              q:1,   u:'pièce'},
+      {n:'Poivron',             q:1,   u:'pièce'},
+      {n:'Épices chili',        q:2,   u:'càc'},
+      {n:"Huile d'olive",       q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:6, nom:'Buddha Bowl Quinoa', cat:'Plat', ico:'🥗',
+    desc:'Bowl coloré : quinoa, patate douce, pois chiches, feta.',
+    ing:[
+      {n:'Quinoa',           q:80,  u:'g'},
+      {n:'Patate douce',     q:200, u:'g'},
+      {n:'Pois chiches',     q:100, u:'g'},
+      {n:'Feta',             q:40,  u:'g'},
+      {n:"Huile d'olive",    q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:7, nom:'Omelette Épinards Post-Séance', cat:'Dîner', ico:'🍳',
+    desc:'Protéines rapides et leucine pour la réparation musculaire.',
+    ing:[
+      {n:'Œufs',          q:3,   u:'pièces'},
+      {n:'Épinards',      q:100, u:'g'},
+      {n:"Huile d'olive", q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:8, nom:'Wok Tofu Légumes Asiatiques', cat:'Dîner', ico:'🥢',
+    desc:'Dîner léger anti-inflammatoire pour les jours de récup.',
+    ing:[
+      {n:'Tofu ferme',              q:150, u:'g'},
+      {n:'Poêlée légumes asiatiques',q:300,u:'g'},
+      {n:'Sauce soja',              q:2,   u:'càs'},
+      {n:'Huile de sésame',         q:1,   u:'càc'},
+    ]
+  },
+  {
+    id:9, nom:'Salade Pâtes Poulet', cat:'Plat', ico:'🥙',
+    desc:'Pâtes refroidies (amidon résistant) pour la microbiote.',
+    ing:[
+      {n:'Pâtes complètes',  q:100, u:'g'},
+      {n:'Poulet cuit',      q:150, u:'g'},
+      {n:'Tomates séchées',  q:50,  u:'g'},
+      {n:'Roquette',         q:30,  u:'g'},
+      {n:"Huile d'olive",    q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:10, nom:'Saumon & Patate Douce', cat:'Dîner', ico:'🐟',
+    desc:'Oméga-3 et bêta-carotène pour la récupération nocturne.',
+    ing:[
+      {n:'Filet de saumon', q:150, u:'g'},
+      {n:'Patate douce',    q:200, u:'g'},
+      {n:'Épinards',        q:150, u:'g'},
+      {n:'Huile de colza',  q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:11, nom:'Porridge Avoine & Myrtilles', cat:'Petit-Déjeuner', ico:'🫐',
+    desc:'Énergie lente + antioxydants pour démarrer la journée.',
+    ing:[
+      {n:"Flocons d'avoine", q:80,  u:'g'},
+      {n:'Kéfir',            q:250, u:'ml'},
+      {n:'Myrtilles',        q:100, u:'g'},
+      {n:'Graines de chia',  q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:12, nom:'Smoothie Vert Protéiné', cat:'Petit-Déjeuner', ico:'🥤',
+    desc:'Digeste et alcalinisant pour les matins légers.',
+    ing:[
+      {n:'Banane',          q:1,   u:'pièce'},
+      {n:'Épinards',        q:100, u:'g'},
+      {n:"Lait d'amande",   q:250, u:'ml'},
+      {n:'Graines de chia', q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:13, nom:'Lentilles Corail & Curcuma', cat:'Dîner', ico:'🍲',
+    desc:'Anti-inflammatoire naturel, protéines végétales et fer.',
+    ing:[
+      {n:'Lentilles corail',    q:150, u:'g'},
+      {n:'Carottes',            q:200, u:'g'},
+      {n:'Curcuma',             q:1,   u:'càc'},
+      {n:'Poivre noir',         q:0.5, u:'càc'},
+      {n:'Oignon',              q:1,   u:'pièce'},
+      {n:'Bouillon de légumes', q:400, u:'ml'},
+    ]
+  },
+  {
+    id:14, nom:'Pancakes Banane & Œufs', cat:'Petit-Déjeuner', ico:'🥞',
+    desc:'Glucides naturels + protéines sans farine ni sucre ajouté.',
+    ing:[
+      {n:'Banane',           q:2,  u:'pièces'},
+      {n:'Œufs',             q:3,  u:'pièces'},
+      {n:"Flocons d'avoine", q:50, u:'g'},
+      {n:'Miel',             q:1,  u:'càc'},
+    ]
+  },
+  {
+    id:15, nom:'Maquereau & Légumes Rôtis', cat:'Dîner', ico:'🐠',
+    desc:'Dîner léger riche en oméga-3 pour les jours de récup.',
+    ing:[
+      {n:'Maquereau',     q:150, u:'g'},
+      {n:'Courgette',     q:1,   u:'pièce'},
+      {n:'Poivron',       q:1,   u:'pièce'},
+      {n:'Carotte',       q:1,   u:'pièce'},
+      {n:'Huile de colza',q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:16, nom:'Œufs Brouillés & Avocat', cat:'Petit-Déjeuner', ico:'🥑',
+    desc:'Protéines complètes + bons lipides pour bien démarrer.',
+    ing:[
+      {n:'Œufs',          q:3,   u:'pièces'},
+      {n:'Avocat',         q:0.5, u:'pièce'},
+      {n:'Pain complet',   q:2,   u:'tranches'},
+      {n:"Huile d'olive",  q:1,   u:'càc'},
+    ]
+  },
+  {
+    id:17, nom:'Steak Haché & Patates Douces', cat:'Plat', ico:'🥩',
+    desc:'Récupération post-run : zinc, potassium et glucides doux.',
+    ing:[
+      {n:'Bœuf haché 5%', q:200, u:'g'},
+      {n:'Patate douce',   q:250, u:'g'},
+      {n:"Huile d'olive",  q:1,   u:'càs'},
+    ]
+  },
+  {
+    id:18, nom:'Sardines & Riz Complet', cat:'Dîner', ico:'🐟',
+    desc:'Oméga-3, fer et antioxydants pour la nuit de récupération.',
+    ing:[
+      {n:'Sardines en conserve', q:130, u:'g'},
+      {n:'Riz complet',          q:80,  u:'g'},
+      {n:'Épinards',             q:100, u:'g'},
+      {n:'Huile de colza',       q:1,   u:'càs'},
+    ]
+  },
+  // ── Collations ───────────────────────────────────────────
+  {
+    id:19, nom:'Banane & Amandes', cat:'Collation', ico:'🍌',
+    desc:'Glucides rapides + énergie durable avant l\'effort.',
+    ing:[
+      {n:'Banane',  q:1,  u:'pièce'},
+      {n:'Amandes', q:30, u:'g'},
+    ]
+  },
+  {
+    id:20, nom:'Pomme, Noix & Chocolat Noir', cat:'Collation', ico:'🍎',
+    desc:'Polyphénols et magnésium pour la récupération active.',
+    ing:[
+      {n:'Pomme',              q:1,  u:'pièce'},
+      {n:'Noix',               q:20, u:'g'},
+      {n:'Chocolat noir 85%',  q:2,  u:'carrés'},
+    ]
+  },
+  {
+    id:21, nom:'Yaourt Grec & Banane', cat:'Collation', ico:'🍯',
+    desc:'Caséine légère + glucides pour une collation récup.',
+    ing:[
+      {n:'Yaourt grec', q:150, u:'g'},
+      {n:'Banane',      q:1,   u:'pièce'},
+      {n:'Miel',        q:1,   u:'càc'},
+    ]
+  },
+  {
+    id:22, nom:'Fromage Blanc & Fruits Rouges', cat:'Collation', ico:'🫙',
+    desc:'Caséine + anthocyanes anti-oxydantes avant le coucher.',
+    ing:[
+      {n:'Fromage blanc', q:150, u:'g'},
+      {n:'Myrtilles',     q:50,  u:'g'},
+    ]
+  },
+];
+
+/* ── Templates ────────────────────────────────────────────── */
+const TPLS = {
+  sport: {
+    lundi:    {pdj:11, dejeuner:5,  collation:19, diner:7 },
+    mardi:    {pdj:12, dejeuner:5,  collation:20, diner:15},
+    mercredi: {pdj:16, dejeuner:6,  collation:21, diner:4 },
+    jeudi:    {pdj:11, dejeuner:9,  collation:19, diner:8 },
+    vendredi: {pdj:16, dejeuner:9,  collation:20, diner:10},
+    samedi:   {pdj:14, dejeuner:17, collation:22, diner:13},
+    dimanche: {pdj:0,  dejeuner:17, collation:21, diner:18},
+  },
+  ultra: {
+    lundi:    {pdj:11, dejeuner:6,  collation:19, diner:18},
+    mardi:    {pdj:16, dejeuner:2,  collation:21, diner:13},
+    mercredi: {pdj:12, dejeuner:5,  collation:19, diner:10},
+    jeudi:    {pdj:11, dejeuner:9,  collation:22, diner:7 },
+    vendredi: {pdj:16, dejeuner:3,  collation:20, diner:15},
+    samedi:   {pdj:14, dejeuner:1,  collation:21, diner:13},
+    dimanche: {pdj:0,  dejeuner:17, collation:22, diner:18},
+  }
+};
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let planning = {};
+let courses  = [];
+let checked  = {};
+
+JOURS.forEach(j => { planning[j] = {pdj:0, dejeuner:0, collation:0, diner:0}; });
+
+/* ════════════════════════════════════════════
+   STORAGE
+════════════════════════════════════════════ */
+function load() {
+  try {
+    const p = localStorage.getItem('mp_plan');
+    if (p) planning = JSON.parse(p);
+    const c = localStorage.getItem('mp_courses');
+    if (c) courses = JSON.parse(c);
+    const k = localStorage.getItem('mp_checked');
+    if (k) checked = JSON.parse(k);
+  } catch(e) {}
+}
+function savePlan() {
+  try { localStorage.setItem('mp_plan', JSON.stringify(planning)); } catch(e) {}
+}
+function saveCrs() {
+  try {
+    localStorage.setItem('mp_courses', JSON.stringify(courses));
+    localStorage.setItem('mp_checked', JSON.stringify(checked));
+  } catch(e) {}
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+function goTab(name) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(el => el.classList.remove('active'));
+  document.getElementById('pane-'+name).classList.add('active');
+  document.getElementById('nb-'+name).classList.add('active');
+}
+
+/* ════════════════════════════════════════════
+   HEADER WEEK LABEL
+════════════════════════════════════════════ */
+function setWeekLabel() {
+  const d = new Date();
+  const opt = {day:'2-digit', month:'short'};
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - ((d.getDay()+6)%7));
+  const sun = new Date(mon);
+  sun.setDate(mon.getDate()+6);
+  document.getElementById('week-label').textContent =
+    `${mon.toLocaleDateString('fr-FR',opt)} – ${sun.toLocaleDateString('fr-FR',opt)}`;
+}
+
+/* ════════════════════════════════════════════
+   TAB 1 – RECETTES
+════════════════════════════════════════════ */
+function renderR(q='') {
+  const ql = q.toLowerCase();
+  const filtered = R.filter(r =>
+    r.nom.toLowerCase().includes(ql) ||
+    r.cat.toLowerCase().includes(ql) ||
+    r.ing.some(i => i.n.toLowerCase().includes(ql))
+  );
+  const el = document.getElementById('r-list');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty"><span class="e-ico">🔍</span><p>Aucune recette trouvée.</p></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(r => {
+    const cs = CAT_STYLE[r.cat] || {bg:'#f5f5f5', color:'#555'};
+    return `
+      <div class="recipe-card" id="rc${r.id}">
+        <div class="rch" onclick="togR(${r.id})">
+          <div class="rc-icon" style="background:${cs.bg}">${r.ico}</div>
+          <div class="rc-info">
+            <div class="rc-name">${r.nom}</div>
+            <span class="cat-tag" style="background:${cs.bg};color:${cs.color}">${r.cat}</span>
+          </div>
+          <span class="rc-chev">▼</span>
+        </div>
+        <div class="rc-body">
+          <div class="rc-body-inner">
+            <div class="ing-title">Ingrédients</div>
+            <div class="ing-pills">
+              ${r.ing.map(i=>`
+                <span class="ing-pill">
+                  <span class="ing-qty">${fmtQ(i.q)}</span>
+                  <span>${i.u}</span>
+                  <span>${i.n}</span>
+                </span>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+function togR(id) {
+  document.getElementById('rc'+id).classList.toggle('open');
+}
+function filterR() {
+  renderR(document.getElementById('q').value);
+}
+function fmtQ(v) {
+  return v % 1 === 0 ? v : v;
+}
+
+/* ════════════════════════════════════════════
+   TAB 2 – PLANNING
+════════════════════════════════════════════ */
+function buildOpts(selId) {
+  const cats = ['Petit-Déjeuner','Plat','Dîner','Collation'];
+  let s = '<option value="0">— Aucun —</option>';
+  cats.forEach(cat => {
+    const list = R.filter(r => r.cat === cat);
+    if (!list.length) return;
+    s += `<optgroup label="${cat}">`;
+    list.forEach(r => {
+      s += `<option value="${r.id}" ${selId==r.id?'selected':''}>${r.ico} ${r.nom}</option>`;
+    });
+    s += '</optgroup>';
+  });
+  return s;
+}
+
+function renderPlan() {
+  const todayIdx = ((new Date().getDay()+6)%7); // 0=lundi
+  document.getElementById('plan-grid').innerHTML = JOURS.map((j,i) => `
+    <div class="day-card">
+      <div class="day-hdr">
+        <span class="day-name">${JOURS_L[j]}</span>
+        ${i===todayIdx ? '<span class="today-badge">Aujourd\'hui</span>' : ''}
+      </div>
+      <div class="meal-rows">
+        ${REPAS.map(r => `
+          <div class="meal-row">
+            <span class="meal-lbl">${REPAS_L[r]}</span>
+            <select class="meal-sel" onchange="onSel('${j}','${r}',this.value)">
+              ${buildOpts(planning[j]?.[r]||0)}
+            </select>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function onSel(jour, repas, val) {
+  if (!planning[jour]) planning[jour] = {};
+  planning[jour][repas] = +val;
+  savePlan();
+}
+
+function loadTpl(type) {
+  const tpl = TPLS[type];
+  JOURS.forEach(j => { planning[j] = Object.assign({}, tpl[j]); });
+  savePlan();
+  renderPlan();
+  toast(type==='sport' ? '🏋️ Menu Sport chargé !' : '⚡ Menu Ultra-Intense chargé !');
+}
+
+/* ════════════════════════════════════════════
+   TAB 3 – COURSES
+════════════════════════════════════════════ */
+/* Normalise French plural/singular units for grouping */
+function normU(u) {
+  const pl = {'pièces':'pièce','carrés':'carré','tranches':'tranche','gousses':'gousse',
+               'sachets':'sachet','boîtes':'boîte','tablettes':'tablette'};
+  return pl[u] || u;
+}
+
+function genCourses() {
+  const map = {};
+  JOURS.forEach(j => {
+    REPAS.forEach(r => {
+      const id = planning[j]?.[r];
+      if (!id) return;
+      const rec = R.find(x => x.id === id);
+      if (!rec) return;
+      rec.ing.forEach(i => {
+        const uKey = normU(i.u);
+        const key = i.n + '__' + uKey;
+        if (map[key]) map[key].q += i.q;
+        else map[key] = {n:i.n, q:i.q, u:uKey};
+      });
+    });
+  });
+  courses = Object.values(map).sort((a,b) => a.n.localeCompare(b.n,'fr'));
+  checked = {};
+  saveCrs();
+  renderCrs();
+  goTab('courses');
+  toast('✅ Liste générée !');
+}
+
+function renderCrs() {
+  const el  = document.getElementById('crs-list');
+  const cnt = document.getElementById('crs-cnt');
+  const bdg = document.getElementById('crs-badge');
+  const remaining = courses.filter((_,i) => !checked[i]).length;
+
+  cnt.textContent = `${remaining} / ${courses.length} article${courses.length>1?'s':''}`;
+  if (remaining > 0) {
+    bdg.textContent = remaining;
+    bdg.classList.remove('hidden');
+  } else {
+    bdg.classList.add('hidden');
+  }
+
+  if (!courses.length) {
+    el.innerHTML = `<div class="empty">
+      <span class="e-ico">🛒</span>
+      <p>Planifiez vos repas dans l'onglet<br><strong>Planning</strong> puis appuyez sur<br><strong>Générer la liste de courses</strong></p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = courses.map((item,i) => {
+    const done = !!checked[i];
+    return `
+      <div class="ci${done?' done':''}" onclick="togCheck(${i})">
+        <div class="ci-check">${done?'✓':''}</div>
+        <span class="ci-name">${item.n}</span>
+        <span class="ci-qty">${fmtQty(item.q, item.u)}</span>
+      </div>`;
+  }).join('');
+}
+
+function fmtQty(q, u) {
+  const v = Math.round(q*10)/10;
+  return `${v % 1 === 0 ? v : v} ${u}`;
+}
+
+function togCheck(i) {
+  checked[i] = !checked[i];
+  saveCrs();
+  renderCrs();
+}
+
+function uncheckAll() {
+  checked = {};
+  saveCrs();
+  renderCrs();
+  toast('Tous les articles décochés');
+}
+
+function copyCrs() {
+  if (!courses.length) { toast('⚠️ Générez d\'abord la liste'); return; }
+  const txt = courses.map(it => `☐ ${it.n} — ${fmtQty(it.q,it.u)}`).join('\n');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt)
+      .then(() => toast('📋 Liste copiée dans le presse-papier !'))
+      .catch(() => fallbackCopy(txt));
+  } else {
+    fallbackCopy(txt);
+  }
+}
+
+function fallbackCopy(txt) {
+  const ta = document.createElement('textarea');
+  ta.value = txt;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); toast('📋 Liste copiée !'); }
+  catch(e) { toast('❌ Copie non supportée par ce navigateur'); }
+  document.body.removeChild(ta);
+}
+
+/* ════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════ */
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('on'), 2600);
+}
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+load();
+setWeekLabel();
+renderR();
+renderPlan();
+renderCrs();
+</script>
+</body>
+</html>
