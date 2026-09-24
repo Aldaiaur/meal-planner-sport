@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f1e9">
+  <meta name="description" content="Carnet de recettes sportives et liste de courses personnelle">
+  <title>Mon carnet de recettes</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="recipes.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <header class="top"><div class="wrap top-inner"><div class="brand"><span class="brand-mark">✳</span><span>LA CUISINE <strong>EN MOUVEMENT</strong></span></div><a href="#courses" class="top-cart">Ma liste <span id="cart-count">0</span></a></div></header>
+  <main class="wrap">
+    <section class="hero"><div><span class="eyebrow">MON CARNET · SPORT & PLAISIR</span><h1>Bien manger,<br><em>tout simplement.</em></h1><p>Des recettes faciles à retrouver et les courses prêtes en quelques clics.</p></div><div class="hero-art" aria-hidden="true"><span>🥑</span><span>🍋</span><span>🥦</span></div></section>
+    <section id="recettes" aria-label="Recettes"><div class="section-heading"><div><span class="eyebrow">01 / LES RECETTES</span><h2>Qu’est-ce qu’on cuisine ?</h2></div><span id="result-count" class="muted"></span></div><div class="controls"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Chercher un plat ou un ingrédient…" aria-label="Chercher une recette"></label><div id="filters" class="filters" role="group" aria-label="Filtrer par catégorie"></div></div><div id="cards" class="cards"></div></section>
+    <section id="courses" class="shopping"><div class="section-heading"><div><span class="eyebrow">02 / À EMPORTER</span><h2>Ma liste de courses</h2></div></div><p class="muted shopping-intro">Ajoute une ou plusieurs recettes. Les quantités identiques s’additionnent et tes coches restent mémorisées sur cet appareil.</p><div class="shopping-layout"><div class="basket"><div class="basket-head"><strong id="shopping-status">Aucun article</strong><div class="basket-actions"><button id="copy" class="text-btn" type="button">Copier</button><button id="print" class="text-btn" type="button">Imprimer</button><button id="clear" class="text-btn danger" type="button">Vider</button></div></div><div id="shopping-list"></div></div><aside class="tip"><span class="tip-icon">✦</span><h3>Une cuisine qui suit ton rythme</h3><p>Prépare plusieurs portions, congèle ce que tu ne manges pas rapidement et ajuste les féculents selon tes sorties ou entraînements.</p><p>La liste est enregistrée dans ton navigateur : pour l’utiliser sur un autre appareil, utilise « Copier » puis envoie-la toi-même.</p></aside></div></section>
+  </main>
+  <footer class="wrap foot"><span>LA CUISINE EN MOUVEMENT</span><span>19 recettes · données sauvegardées localement</span></footer>
+  <dialog id="recipe-dialog"><div class="dialog-shell"><button id="close-dialog" class="close" type="button" aria-label="Fermer">×</button><div id="recipe-content"></div></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
