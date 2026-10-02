@@ -68,3 +68,18 @@ section[id]{scroll-margin-top:14px}
   .prep-item{flex-wrap:wrap}.prep-links{flex-direction:row;gap:14px;width:100%;padding-left:29px}
   .data-actions{grid-template-columns:1fr}
 }
+/* Onglet Sport */
+.sport-section{padding:0 0 78px}.sport-top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start;margin-bottom:10px}
+.dose-card,.calc{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:23px}.dose-card{background:#e8eee2}.dose-card h3,.calc h3{font:24px Georgia,serif;margin:6px 0 10px}.dose-card p,.dose-card li{font-size:14px;color:#3f5247}.dose-card ul{padding-left:20px;margin:8px 0 12px}.dose-card li{margin-bottom:6px}
+.dose-warn{background:var(--paper);border-radius:10px;padding:10px 12px;font-weight:700}.ev-legend{font-size:12px!important;line-height:2;color:var(--muted)!important}
+.ev{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.06em;padding:2px 7px;border-radius:99px;vertical-align:1px;white-space:nowrap}.ev-prouve{background:#d5ead9;color:#1e5a37}.ev-probable{background:#f6e6cf;color:#7a512d}.ev-terrain{background:#e2e6f3;color:#3b4a7a}.ev-mythe{background:#f5dcd6;color:#93392a}
+.calc-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid #ebeadd;font-size:14px}.calc-row>label{font-weight:750}
+.calc-dur{display:flex;align-items:center;gap:6px}.calc-dur input,.calc-dur select{width:64px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;font-size:15px;color:var(--ink)}
+.calc-rate{display:flex;flex-direction:column;gap:4px}.calc-rate label{display:flex;align-items:center;gap:6px;cursor:pointer}.calc-rate input{accent-color:var(--green)}.calc-rate small{color:var(--muted)}
+.calc-result{padding:12px 0 4px;font-size:14px}.calc-result p{margin:0 0 6px}.calc-result h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin:14px 0 6px}.calc-result ul{padding-left:18px;margin:0}.calc-result li{margin-bottom:5px}
+.sp-big{font:30px/1.1 Georgia,serif!important;color:var(--green);margin:4px 0 6px!important}.sp-eq{display:flex;flex-wrap:wrap;gap:6px}.sp-eq span{background:var(--light);border-radius:99px;padding:3px 10px;font-size:13px}
+.calc .add{margin-top:14px}.sport-group{font:24px Georgia,serif;margin:30px 0 14px}
+.tips{padding-left:20px;margin:0}.tips li{padding:0 0 9px 4px;font-size:14px}
+@media(max-width:860px){.sport-top{grid-template-columns:1fr}}
+@media(max-width:590px){.sport-section{padding-bottom:50px}.dose-card,.calc{padding:19px}}
+@media print{#sport{display:none!important}}
