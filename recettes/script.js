@@ -43,7 +43,7 @@ const DEFAULT_MEAL={'Petit-déjeuner':'pdj','Snacks':'collation','Sides':'side'}
 // Les recettes de l'onglet Sport (r.sport) restent hors du carnet, du planning et de la session meal prep
 const kitchen = () => recipes.filter(r=>!r.sport);
 // Niveaux de preuve affichés en pastilles : [PROUVÉ] [PROBABLE] [TERRAIN] [MYTHE]
-const ev = s => esc(s).replace(/\[(PROUVÉ|PROBABLE|TERRAIN|MYTHE)\]/g,(m,t)=>`<span class="ev ev-${norm(t)}">${t}</span>`);
+const ev = s => esc(s).replace(/\[(PROUVÉ|PROBABLE|TERRAIN|MYTHE|DÉBATTU)\]/g,(m,t)=>`<span class="ev ev-${norm(t)}">${t}</span>`);
 function renderFilters(){const cats=['Tout',...new Set(kitchen().map(r=>r.category))];$('#filters').innerHTML=cats.map(c=>`<button type="button" class="filter ${c===state.category?'active':''}" data-filter="${esc(c)}" aria-pressed="${c===state.category}">${esc(c)}</button>`).join('')}
 const badges = r => [/cong[eé]l/i.test(r.keep)&&'❄️ Congélable',/air fryer/i.test(r.tools)&&'💨 Air fryer',/mijoteuse/i.test(r.tools)&&'🍲 Mijoteuse',r.yield>=6&&/^(portion|parts)/.test(r.unit)&&'📦 Meal prep'].filter(Boolean);
 function renderCards(){const q=norm(state.query);const found=kitchen().filter(r=>(state.category==='Tout'||r.category===state.category)&&(!q||norm([r.name,r.category,...r.ingredients.filter(isIng).map(i=>i[0]),...(r.variants||[]).map(v=>v.label),...badges(r)].join(' ')).includes(q)));$('#result-count').textContent=`${found.length} recette${found.length>1?'s':''}`;$('#cards').innerHTML=found.map(cardHTML).join('')||'<p class="empty">Aucune recette trouvée.</p>'}

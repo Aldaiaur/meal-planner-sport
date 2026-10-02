@@ -83,3 +83,14 @@ section[id]{scroll-margin-top:14px}
 @media(max-width:860px){.sport-top{grid-template-columns:1fr}}
 @media(max-width:590px){.sport-section{padding-bottom:50px}.dose-card,.calc{padding:19px}}
 @media print{#sport{display:none!important}}
+/* Gut training */
+.ev-debattu{background:#ece3f3;color:#5d3a7a}
+.gut{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);margin:6px 0 10px;overflow:hidden}
+.gut summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:14px;padding:20px 23px}.gut summary::-webkit-details-marker{display:none}
+.gut summary>span:first-child{display:flex;flex-direction:column;gap:3px}.gut summary strong{font:22px Georgia,serif}.gut summary small{color:var(--muted);font-size:13px}
+.gut-chev{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--light);color:var(--green);font-weight:800;flex-shrink:0;transition:transform .2s}.gut[open] .gut-chev{transform:rotate(45deg)}
+.gut-body{padding:0 23px 20px;border-top:1px solid var(--line);font-size:14px;color:#3f5247}.gut-body>p:first-child{margin-top:16px}
+.gut-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.gut h4{font:19px Georgia,serif;color:var(--ink);margin:16px 0 8px}.gut ul,.gut ol{padding-left:20px;margin:0}.gut li{margin-bottom:8px}
+.gut-protocol{background:#e8eee2;border-radius:14px;padding:4px 18px 10px;margin-top:16px}
+.steps-rate{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.steps-rate span{background:var(--green);color:#fff;border-radius:99px;padding:1px 8px;font-weight:800;font-size:12px}
+@media(max-width:700px){.gut-grid{grid-template-columns:1fr;gap:0}.gut summary{padding:18px}.gut-body{padding:0 18px 18px}.steps-rate{white-space:normal;flex-wrap:wrap}}
